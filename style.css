@@ -16,6 +16,7 @@ body {
     margin:0;
     padding:0;
     font-family: 'Heebo', sans-serif;
+    background-color:rgb(128, 170, 248);
 }
 
 .frame {
@@ -43,6 +44,8 @@ body {
     display:block;
     padding:0;
     margin:0;
+    background-color:white;
+    height:100vh;
 }
 
 .panel {
@@ -83,21 +86,23 @@ label {
     padding-left:0;
     color:gray;
 }
-input {
-    display:block;
-    width:90%;
+.city-input {
+    display:inline-block;
+    float:left;
+    width:80%;
     box-sizing: border-box;
-    margin:auto;
+    margin-right:0;
     padding:10px;
     font-size:1.3em;
     border:1px solid #cccccc;
     outline:none;
+    margin-left:5%;
 }
 
 .formButton {
-    margin-left:12px;
-    padding:12px;
-    margin-right:24px;
+    margin-left:0px;
+    padding:10px;
+    margin-top:0px;
     float:right;
     color:white;
     text-transform: uppercase;
@@ -105,12 +110,13 @@ input {
     border-radius:4px;
     border:none;
     box-shadow:0 0 2px gray;
-    margin-top:8px;
     cursor: pointer;
     outline:none;
     user-select: none;
-
+    display:inline-block;
+    float:left;
     font-size:1em;
+    margin-left:4px;
 }
 
 .formButton:hover {  
@@ -123,18 +129,21 @@ input {
     outline:none;
 }
 
-.cityButtons{
+.cityButtonBlock {
     display:block;
-    border:2px solid black;
-    width:100%;
+    border:1px solid #aaaaaa;
+    width:90%;
     box-sizing: border-box;
     min-height:100px;
+    margin:auto;
 }
 
 .cityButton {
     width:100%;
     box-sizing: border-box;
     padding:10px;
+    user-select: none;
+    cursor: pointer;
 }
 
 form {
@@ -175,8 +184,22 @@ zoom: 1;
         margin-left:16px;
     }
 
-    .formButton {
-        margin-right:14px;
+    .city-input {
+        display:inline-block;
+        float:left;
+        width:70%;
+        box-sizing: border-box;
+        margin-right:0;
+        padding:10px;
+        font-size:1.3em;
+        border:1px solid #cccccc;
+        outline:none;
+        margin-left:5%;
     }
+
+    .formButton {
+       
+    }
+
 }
 

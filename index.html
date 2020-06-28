@@ -6,6 +6,7 @@
     <title>Weather-Dashboard</title>
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
+
 <body>
 
   <div class='frame group'>
@@ -15,11 +16,16 @@
     <div class='wrapper group'>
       <div class='panel group'>
         <form class='group'>
-          <label>City:</label>
-          <input type="text" id="city-input" />
-          <button type="submit" class='formButton' id='add-city'>Add New City</button>
+          <label>Search for a City:</label>
+          <input type="text" id="city-input" class='city-input'/>
+          <button type="submit" class='formButton' id='add-city'> <img 
+            src="search_white.svg" 
+            alt="triangle with all three sides equal"
+            height="20"
+            width="20" /></button>
+
         </form>
-        <div id="city-buttons" class='cityButtons'>
+        <div id="city-buttons" class='cityButtonBlock'>
 
         </div>
       </div>
