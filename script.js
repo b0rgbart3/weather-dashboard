@@ -1,4 +1,4 @@
-$(document).ready(function() {
+//   Javascript code by Bart Dority
 
     // respond to user input of city names
     // by generating an ajax get request from the openweathermap API
@@ -6,28 +6,65 @@ $(document).ready(function() {
     // also, store the user requested city names in local Storage
     // and create buttons for each city
 
-    responseObject = retrieveWeatherForcast("San+Francisco");
-    
-    $('#add-city').click(function(event) {
-      event.preventDefault();
 
-       var newCity = $("#city-input").val();
-       createPanelButton(newCity);
-    });
+var cities = [];
+
+$(document).ready(function() {
+    // This was my first test of the forecast function
+    //responseObject = getForecast("San+Francisco");
+    
+
+    // If the user clicks the add city button (submit) - 
+    // Let's add the name of the city they put in the input
+    // field to our list of cities.
+
+    $('#add-city').click(addCity);
 
 });
 
+var addCity = function(event) {
+  event.preventDefault();
+
+  // grab the city name from the input field
+  
+   var newCity = $("#city-input").val();
+   if (newCity.length > 2) {
+      // Need more validation here -- for now we are just checking
+      // to see if there are more than two chars
+
+      cities.push(newCity);
+   }
+   // we used to create a button every time the user
+   // added a new city.
+   // But with this refactor -- all the buttons get created at the
+   // same time with the same function - displayCityButtons()
+  // createPanelButton(newCity);
+   displayCityButtons();
+}
+
+// displayCityButtons
+// This function wipes clear and displays our full list
+// of cities as buttons in the panel
+
+var displayCityButtons = function() {
+  $("#city-buttons").empty();
+
+  cities.forEach( function(city,index) {
+    createPanelButton(city,index);
+  })
+}
 // Need to refactor this so it uses an array to build all the buttons
 // rather than adding a new one each time directly.
 
-var createPanelButton = function(city) {
+var createPanelButton = function(city,index) {
   var newButton = $("<button>");
   newButton.text(city);
+  newButton.attr("data-id", index);
   newButton.addClass("cityButton");
   $("#city-buttons").prepend(newButton);
 }
 
-var retrieveWeatherForcast = function(city) {
+var getForecast = function(city) {
   
   // revise the city name to make sure it doesn't contain spaces
   var revisedCityString = city.trim().replace(/ /g,"+");
@@ -42,10 +79,10 @@ var retrieveWeatherForcast = function(city) {
     method: "GET"
   })
     // After data comes back from the request
-    .then(addNewCity);
+    .then(displayForecast);
 }
 
-var addNewCity = function(response) {
+var displayForecast = function(response) {
   console.log("In Add New City: " + JSON.stringify(response));
 }
 
