@@ -9,11 +9,20 @@
 
 var cities = [];
 
-$(document).ready(function() {
-    // This was my first test of the forecast function
-    //responseObject = getForecast("San+Francisco");
-    
+//  This method could respond to user input in the input field
+// as they are typing it -- for now it is not implemented.
+$(document).on("keypress", "#city-input", function(e){
+  //console.log($(this).val());
+  if(e.which == 13){
+      var inputVal = $(this).val();
+    //  alert("You've entered: " + inputVal);
+  }
+});
 
+$(document).ready(function() {
+
+    cities = JSON.parse(localStorage.getItem("wd-cities"));
+    displayCityButtons();
     // If the user clicks the add city button (submit) - 
     // Let's add the name of the city they put in the input
     // field to our list of cities.
@@ -33,6 +42,7 @@ var addCity = function(event) {
       // to see if there are more than two chars
 
       cities.push(newCity);
+      localStorage.setItem("wd-cities", JSON.stringify(cities));
    }
    // we used to create a button every time the user
    // added a new city.
