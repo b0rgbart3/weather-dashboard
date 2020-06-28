@@ -14,6 +14,7 @@ var activeCity = 0;
 // store the forecast data in a local object
 // so we don't have to ping an outside server every time
 var forecasts = {};
+var uv_indexes = {};
 
 
 //  This method could respond to user input in the input field
@@ -40,13 +41,14 @@ $(document).ready(function() {
 
     $("#add-city").click(addCity);
     $(".city-button").click(chooseCity);
+  
 
 });
 var chooseCity = function(event) {
   activeCity = $(event.target).data("id");
 
-   console.log("Active City: " + activeCity);
-   console.log(cities[activeCity]);
+  // console.log("Active City: " + activeCity);
+  // console.log(cities[activeCity]);
   getForecast( cities[activeCity] );
   if (forecasts[cities[activeCity]]) {
     displayForecast( cities[activeCity] );
@@ -104,7 +106,9 @@ var createPanelButton = function(city,index) {
 }
 
 var getForecasts = function() {
+
   cities.forEach( function(city){
+   // console.log("Getting forecast for: "+city);
     getForecast(city);
   } );
 }
@@ -112,8 +116,9 @@ var getForecast = function(city) {
   // If we haven't yet grabbed the forecast data from the server,
   if (!forecasts[city]) {
    
+    //console.log("sending a get for: " + city);
     // revise the city name to make sure it doesn't contain spaces
-    var revisedCityString = cities[activeCity].trim().replace(/ /g,"+");
+    var revisedCityString = city.trim().replace(/ /g,"+");
 
     // Constructing a queryURL using the revised city name
 
@@ -130,26 +135,82 @@ var getForecast = function(city) {
 }
 
 var collectForecast = function(response) {
-  var main, description, farenheight, feel, temp_min, temp_max, humidity, windspeed, uv_index, name; 
+  var main, description, farenheight, feel, temp_min, temp_max, humidity, windspeed, uv_index, lat, lon, name; 
+
   main = response.weather[0].main;
   description = response.weather[0].description; 
   farenheight = ((response.main.temp * (9/5) ) - 459.67);
   humidity = response.main.humidity;
   windspeed = response.wind.speed;
+  lat = response.coord.lat;
+  lon = response.coord.lon;
+
   name = response.name;
 
-  var newForecast = {"name": name, "main":main,"description":description,"farenheight":farenheight,"humidity":humidity,"windspeed":windspeed};
+  var newForecast = {"name": name, "main":main,"description":description,"farenheight":farenheight,"humidity":humidity,"windspeed":windspeed, "lat": lat, "lon": lon};
 
   forecasts[name] = newForecast;
+  // console.log(newForecast);
 
-   displayForecast(name);
+  if (!uv_indexes[name]) {
+   
+    // Get the Lat and Lon from our Forecasts aray
+    var lat = forecasts[name].lat;
+    var lon = forecasts[name].lon;
+    // Constructing a queryURL using the revised city name
+
+    //http://samples.openweathermap.org/data/2.5/uvi/forecast?lat=37.75&lon=-122.37&appid=439d4b804bc8187953eb36d2a8c26a02
+
+    var queryURL = "https://api.openweathermap.org/data/2.5/uvi/forecast?lat="+lat+"&lon="+lon+"&appid=196510002b5290425c8c92315ac3753d";
+
+    // Performing an AJAX request with the queryURL
+    $.ajax({
+      url: queryURL,
+      method: "GET"
+    })
+      // After data comes back from the request
+      .then(collectUV);
+  }
+
+
+   // displayForecast(name);
+}
+
+var collectUV = function(response) {
+  var UV_index = response[0].value;
+  var lat = response[0].lat;
+  var lon = response[0].lon;
+
+  // Use the lat and lon values to match to our Forecasts aray
+  var cityName = findCityBasedOnCoords(lat,lon);
+   //console.log(lat + ", " + lon);
+   //console.log("Found a corresponding city name: " + cityName);
+  // console.log("Got into collectUV: " + UV_index);
+  uv_indexes[cityName] = UV_index;
+
+  if (Object.keys(forecasts).length === cities.length)  {
+    displayForecast(cities[0]);
+  }
+}
+
+var findCityBasedOnCoords=function(lat,lon) {
+ // console.log("In findCity: "+ JSON.stringify(forecasts ));
+  var keys = Object.keys(forecasts);
+
+  for (var i =0; i < keys.length; i++) {
+   // console.log(forecasts[keys[i]]);
+    if ((forecasts[keys[i]].lat === lat) && (forecasts[keys[i]].lon === lon)) {
+      return forecasts[keys[i]].name;
+    }
+  }
 }
 
 var displayForecast = function(city) {
 
   $("#todays-weather-info").empty();
   
-  var city, forecast, temp, main, description, temperature, feel, temp_min, temp_max, humidity; 
+  var city, lat, lon, forecast, temp, main, description, temperature, feel, temp_min, temp_max, humidity,
+  uv_index; 
 
   
   //city = cities[activeCity];
@@ -169,6 +230,9 @@ var displayForecast = function(city) {
   humidity.text("Humidity: " + forecast.humidity + " %");
   windspeed = $("<p>");
   windspeed.text("Wind Speed: " + forecast.windspeed + " MPH");
+  uv_index = $("<p>");
+  uv_index.text("UV - Index: " + uv_indexes[city]);
+  
   // uv_index = $("<p>");
   // uv_index.text("UV Index: " + response.wind.speed + " MPH¸");
 
@@ -178,6 +242,7 @@ var displayForecast = function(city) {
   $("#todays-weather-info").append(temperature);
   $("#todays-weather-info").append(humidity);
   $("#todays-weather-info").append(windspeed);
+  $("#todays-weather-info").append(uv_index);
 
 }
 
