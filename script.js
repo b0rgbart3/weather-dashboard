@@ -32,17 +32,19 @@ $(document).ready(function() {
 });
 
 var addCity = function(event) {
-  event.preventDefault();
+   event.preventDefault();
 
   // grab the city name from the input field
   
    var newCity = $("#city-input").val();
    if (newCity.length > 2) {
-      // Need more validation here -- for now we are just checking
-      // to see if there are more than two chars
+      // Start with checking to see if there are more than two chars
 
-      cities.push(newCity);
-      localStorage.setItem("wd-cities", JSON.stringify(cities));
+      // make sure this city is not already in our list
+      if (!cities.includes(newCity)) {
+        cities.push(newCity);
+        localStorage.setItem("wd-cities", JSON.stringify(cities));
+      }
    }
    // we used to create a button every time the user
    // added a new city.
