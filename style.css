@@ -123,6 +123,24 @@ input {
     outline:none;
 }
 
+.cityButtons{
+    display:block;
+    border:2px solid black;
+    width:100%;
+    box-sizing: border-box;
+    min-height:100px;
+}
+
+.cityButton {
+    width:100%;
+    box-sizing: border-box;
+    padding:10px;
+}
+
+form {
+    display:block;
+    margin-bottom:10px;
+}
 
 /*  ClearFix  */
 /*  The ClearFix by Tony Aslett and Nicholas Gallagher */

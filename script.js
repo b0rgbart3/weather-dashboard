@@ -8,8 +8,24 @@ $(document).ready(function() {
 
     responseObject = retrieveWeatherForcast("San+Francisco");
     
+    $('#add-city').click(function(event) {
+      event.preventDefault();
+
+       var newCity = $("#city-input").val();
+       createPanelButton(newCity);
+    });
+
 });
 
+// Need to refactor this so it uses an array to build all the buttons
+// rather than adding a new one each time directly.
+
+var createPanelButton = function(city) {
+  var newButton = $("<button>");
+  newButton.text(city);
+  newButton.addClass("cityButton");
+  $("#city-buttons").prepend(newButton);
+}
 
 var retrieveWeatherForcast = function(city) {
   
