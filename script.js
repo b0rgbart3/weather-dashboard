@@ -19,7 +19,7 @@ var forecasts = {};
 //  This method could respond to user input in the input field
 // as they are typing it -- for now it is not implemented.
 $(document).on("keypress", "#city-input", function(e){
-  //console.log($(this).val());
+
   if(e.which == 13){
       var inputVal = $(this).val();
     //  alert("You've entered: " + inputVal);
@@ -29,8 +29,11 @@ $(document).on("keypress", "#city-input", function(e){
 $(document).ready(function() {
 
     cities = JSON.parse(localStorage.getItem("wd-cities"));
+
+    getForecasts();
     displayCityButtons();
-    getForecast(cities[activeCity]);
+
+   // getForecast(cities[activeCity]);
     // If the user clicks the add city button (submit) - 
     // Let's add the name of the city they put in the input
     // field to our list of cities.
@@ -41,8 +44,13 @@ $(document).ready(function() {
 });
 var chooseCity = function(event) {
   activeCity = $(event.target).data("id");
+
+   console.log("Active City: " + activeCity);
+   console.log(cities[activeCity]);
   getForecast( cities[activeCity] );
- // displayForecast();
+  if (forecasts[cities[activeCity]]) {
+    displayForecast( cities[activeCity] );
+  }
 }
 
 var addCity = function(event) {
@@ -57,9 +65,10 @@ var addCity = function(event) {
       // make sure this city is not already in our list
       if (!cities.includes(newCity)) {
         cities.push(newCity);
-        activeCity = 0;
+        activeCity = cities.length-1;
         localStorage.setItem("wd-cities", JSON.stringify(cities));
       }
+      getForecast(newCity);
    }
    // we used to create a button every time the user
    // added a new city.
@@ -67,7 +76,7 @@ var addCity = function(event) {
    // same time with the same function - displayCityButtons()
   // createPanelButton(newCity);
    displayCityButtons();
-   getForecast(cities[activeCity]);
+  
 }
 
 // displayCityButtons
@@ -80,7 +89,7 @@ var displayCityButtons = function() {
   cities.forEach( function(city,index) {
     createPanelButton(city,index);
   });
-  console.log("Done displaying city buttons.");
+
 }
 // Need to refactor this so it uses an array to build all the buttons
 // rather than adding a new one each time directly.
@@ -90,17 +99,21 @@ var createPanelButton = function(city,index) {
   newButton.text(city);
   newButton.attr("data-id", index);
   newButton.addClass("city-button");
+  newButton.click(chooseCity);
   $("#city-button-block").prepend(newButton);
 }
 
+var getForecasts = function() {
+  cities.forEach( function(city){
+    getForecast(city);
+  } );
+}
 var getForecast = function(city) {
   // If we haven't yet grabbed the forecast data from the server,
-  if (forecasts[city]) {
-    displayForecast() }
-    else {
+  if (!forecasts[city]) {
    
     // revise the city name to make sure it doesn't contain spaces
-    var revisedCityString = city.trim().replace(/ /g,"+");
+    var revisedCityString = cities[activeCity].trim().replace(/ /g,"+");
 
     // Constructing a queryURL using the revised city name
 
@@ -125,36 +138,37 @@ var collectForecast = function(response) {
   windspeed = response.wind.speed;
   name = response.name;
 
-  var newForecast = {"main":main,"description":description,"farenheight":farenheight,"humidity":humidity,"windspeed":windspeed};
+  var newForecast = {"name": name, "main":main,"description":description,"farenheight":farenheight,"humidity":humidity,"windspeed":windspeed};
 
   forecasts[name] = newForecast;
-  //console.log(forecasts);
-  displayForecast();
+
+   displayForecast(name);
 }
 
-var displayForecast = function() {
-  //console.log("In Add New City: " + JSON.stringify(response));
+var displayForecast = function(city) {
+
   $("#todays-weather-info").empty();
   
-  var city, forecast, temp, main, description, temperature, feel, temp_min, temp_max, humidity, 
+  var city, forecast, temp, main, description, temperature, feel, temp_min, temp_max, humidity; 
 
   
-  city = cities[activeCity];
-  //console.log(city);
+  //city = cities[activeCity];
+
   forecast = forecasts[city];
- // console.log(forecasts);
+
   title = $("<h1>");
   title.text(city);
   main= $("<p>");
-  main.text(forecast.main);
+  if (forecast.main) {
+  main.text(forecast.main); }
   description = $("<p>");
   description.text(forecast.description); 
   temperature = $("<p>");
   temperature.html("Temperature: " + forecast.farenheight.toFixed(2) + "	&#176;F");
   humidity = $("<p>");
   humidity.text("Humidity: " + forecast.humidity + " %");
-  // windspeed = $("<p>");
-  // windspeed.text("Wind Speed: " + response.wind.speed + " MPH¸");
+  windspeed = $("<p>");
+  windspeed.text("Wind Speed: " + forecast.windspeed + " MPH");
   // uv_index = $("<p>");
   // uv_index.text("UV Index: " + response.wind.speed + " MPH¸");
 
@@ -163,7 +177,7 @@ var displayForecast = function() {
   $("#todays-weather-info").append(description);
   $("#todays-weather-info").append(temperature);
   $("#todays-weather-info").append(humidity);
-  // $("#todays-weather-info").append(windspeed);
+  $("#todays-weather-info").append(windspeed);
 
 }
 
