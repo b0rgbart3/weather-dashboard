@@ -81,7 +81,7 @@ text-align: center;
 
 label {
     display:block;
-    margin-left:26px;
+    margin-left:5%;
     font-size:1.2em;
     padding-left:0;
     color:gray;
@@ -129,7 +129,7 @@ label {
     outline:none;
 }
 
-.cityButtonBlock {
+.city-button-block {
     display:block;
     border:1px solid #aaaaaa;
     width:90%;
@@ -138,7 +138,7 @@ label {
     margin:auto;
 }
 
-.cityButton {
+.city-button {
     width:100%;
     box-sizing: border-box;
     padding:10px;
@@ -149,6 +149,22 @@ label {
 form {
     display:block;
     margin-bottom:10px;
+}
+.todays-weather-info {
+    border:2px solid gray;
+    border-radius:20px;
+
+    width:90%;
+    margin:auto;
+    min-height:200px;
+    margin-top:40px;
+    padding:10px;
+    padding-left:5%;
+    box-sizing: border-box;
+}
+
+.todays-weather-info h1 {
+
 }
 
 /*  ClearFix  */
@@ -180,10 +196,6 @@ zoom: 1;
         min-height:70vh;
     }
 
-    label {
-        margin-left:16px;
-    }
-
     .city-input {
         display:inline-block;
         float:left;
@@ -195,10 +207,6 @@ zoom: 1;
         border:1px solid #cccccc;
         outline:none;
         margin-left:5%;
-    }
-
-    .formButton {
-       
     }
 
 }
