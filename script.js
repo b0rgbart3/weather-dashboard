@@ -106,15 +106,21 @@ var getForecast = function(city) {
     .then(displayForecast);
 }
 
+
 var displayForecast = function(response) {
   //console.log("In Add New City: " + JSON.stringify(response));
   $("#todays-weather-info").empty();
   
-  var cityTitle = $("<h1>");
-  cityTitle.text(cities[activeCity]);
-  console.log("--" + cities[activeCity]);
+  var title = $("<h1>");
+  title.text(cities[activeCity]);
+  var main= $("<p>");
+  main.text(response.weather[0].main);
+  var description = $("<p>");
+  description.text(response.weather[0].description); 
 
-  $("#todays-weather-info").append(cityTitle);
+  $("#todays-weather-info").append(title);
+  $("#todays-weather-info").append(main);
+  $("#todays-weather-info").append(description);
 }
 
 // In Add New City: {"coord":{"lon":-122.42,"lat":37.77},"weather":[{"id":803,"main":"Clouds","description":"broken clouds","icon":"04n"}],"base":"stations","main":{"temp":286.45,"feels_like":280.07,"temp_min":285.37,"temp_max":287.59,"pressure":1009,"humidity":82},"visibility":16093,"wind":{"speed":9.3,"deg":270},"clouds":{"all":75},"dt":1593318802,"sys":{"type":1,"id":5817,"country":"US","sunrise":1593262198,"sunset":1593315334},"timezone":-25200,"id":5391959,"name":"San Francisco","cod":200}
