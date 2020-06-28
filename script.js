@@ -11,6 +11,11 @@ var cities = [];
 // an index to the city name that we are currently viewing
 var activeCity = 0;
 
+// store the forecast data in a local object
+// so we don't have to ping an outside server every time
+var forecasts = {};
+
+
 //  This method could respond to user input in the input field
 // as they are typing it -- for now it is not implemented.
 $(document).on("keypress", "#city-input", function(e){
@@ -37,6 +42,7 @@ $(document).ready(function() {
 var chooseCity = function(event) {
   activeCity = $(event.target).data("id");
   getForecast( cities[activeCity] );
+ // displayForecast();
 }
 
 var addCity = function(event) {
@@ -88,39 +94,77 @@ var createPanelButton = function(city,index) {
 }
 
 var getForecast = function(city) {
-  
-  console.log("Getting the forecast for: " + city);
-  // revise the city name to make sure it doesn't contain spaces
-  var revisedCityString = city.trim().replace(/ /g,"+");
+  // If we haven't yet grabbed the forecast data from the server,
+  if (forecasts[city]) {
+    displayForecast() }
+    else {
+   
+    // revise the city name to make sure it doesn't contain spaces
+    var revisedCityString = city.trim().replace(/ /g,"+");
 
-  // Constructing a queryURL using the revised city name
+    // Constructing a queryURL using the revised city name
 
-  var queryURL = "https://api.openweathermap.org/data/2.5/weather?q="+revisedCityString+"&appid=196510002b5290425c8c92315ac3753d";
+    var queryURL = "https://api.openweathermap.org/data/2.5/weather?q="+revisedCityString+"&appid=196510002b5290425c8c92315ac3753d";
 
-  // Performing an AJAX request with the queryURL
-  $.ajax({
-    url: queryURL,
-    method: "GET"
-  })
-    // After data comes back from the request
-    .then(displayForecast);
+    // Performing an AJAX request with the queryURL
+    $.ajax({
+      url: queryURL,
+      method: "GET"
+    })
+      // After data comes back from the request
+      .then(collectForecast);
+  }
 }
 
+var collectForecast = function(response) {
+  var main, description, farenheight, feel, temp_min, temp_max, humidity, windspeed, uv_index, name; 
+  main = response.weather[0].main;
+  description = response.weather[0].description; 
+  farenheight = ((response.main.temp * (9/5) ) - 459.67);
+  humidity = response.main.humidity;
+  windspeed = response.wind.speed;
+  name = response.name;
 
-var displayForecast = function(response) {
+  var newForecast = {"main":main,"description":description,"farenheight":farenheight,"humidity":humidity,"windspeed":windspeed};
+
+  forecasts[name] = newForecast;
+  //console.log(forecasts);
+  displayForecast();
+}
+
+var displayForecast = function() {
   //console.log("In Add New City: " + JSON.stringify(response));
   $("#todays-weather-info").empty();
   
-  var title = $("<h1>");
-  title.text(cities[activeCity]);
-  var main= $("<p>");
-  main.text(response.weather[0].main);
-  var description = $("<p>");
-  description.text(response.weather[0].description); 
+  var city, forecast, temp, main, description, temperature, feel, temp_min, temp_max, humidity, 
+
+  
+  city = cities[activeCity];
+  //console.log(city);
+  forecast = forecasts[city];
+ // console.log(forecasts);
+  title = $("<h1>");
+  title.text(city);
+  main= $("<p>");
+  main.text(forecast.main);
+  description = $("<p>");
+  description.text(forecast.description); 
+  temperature = $("<p>");
+  temperature.html("Temperature: " + forecast.farenheight.toFixed(2) + "	&#176;F");
+  humidity = $("<p>");
+  humidity.text("Humidity: " + forecast.humidity + " %");
+  // windspeed = $("<p>");
+  // windspeed.text("Wind Speed: " + response.wind.speed + " MPH¸");
+  // uv_index = $("<p>");
+  // uv_index.text("UV Index: " + response.wind.speed + " MPH¸");
 
   $("#todays-weather-info").append(title);
   $("#todays-weather-info").append(main);
   $("#todays-weather-info").append(description);
+  $("#todays-weather-info").append(temperature);
+  $("#todays-weather-info").append(humidity);
+  // $("#todays-weather-info").append(windspeed);
+
 }
 
 // In Add New City: {"coord":{"lon":-122.42,"lat":37.77},"weather":[{"id":803,"main":"Clouds","description":"broken clouds","icon":"04n"}],"base":"stations","main":{"temp":286.45,"feels_like":280.07,"temp_min":285.37,"temp_max":287.59,"pressure":1009,"humidity":82},"visibility":16093,"wind":{"speed":9.3,"deg":270},"clouds":{"all":75},"dt":1593318802,"sys":{"type":1,"id":5817,"country":"US","sunrise":1593262198,"sunset":1593315334},"timezone":-25200,"id":5391959,"name":"San Francisco","cod":200}
