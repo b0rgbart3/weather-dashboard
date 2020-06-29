@@ -211,21 +211,49 @@ var collectForecast = function(response) {
 
 var displayForecast = function() {
    var thisForecast = forecasts[activeCity];
-   var f_temp, f_humidity, f_main, f_description;
-   for (var i = 0; i < 5; i++ )
+   var f_temp, f_humidity, f_main, f_description, f_count, newDate;
+   f_count =0;
+   $("#5-day-forecast").empty();
+   for (var i = 0; f_count < 5; i++ )
    {
-      console.log("Displaying a forecast: " + JSON.stringify(thisForecast[i] ));
+    f_date = thisForecast[i].dt_txt;
+    f_date_array = f_date.split(" ");
+    f_date = f_date_array[0];
+
+      while ((i > 0) && (f_date === thisForecast[i-1].dt_txt.split(" ")[0] ) ) {
+        i++;
+      }
+
+      f_date = thisForecast[i].dt_txt;
+      f_date_array = f_date.split(" ");
+      f_date = f_date_array[0];
+      
+      newDate = $("<p class=\"forecast-date\">");      
+      newDate.html(f_date);
+
+
       f_temp = thisForecast[i].main.temp;
       f_humidity = thisForecast[i].main.humidity;
       f_main = thisForecast[i].weather.main;
       f_description = thisForecast[i].weather.description;
 
       var newCard = $("<div class='forecast-card'>");
+    
+
       var newTemp = $("<p>");
-      newTemp.text("Temp: " + f_temp);
+      farenheight = ((f_temp * (9/5) ) - 459.67);
+
+      newTemp.html("Temp: <br>" + farenheight.toFixed(2) + "	&#176;F");
+      var newHum = $("<p>");
+      newHum.html("<br>Humidity:" + f_humidity + "%");
+
+      newCard.append(newDate);
       newCard.append(newTemp);
+      newCard.append(newHum);
 
       $("#5-day-forecast").append(newCard);
+      f_count++;
+
    }
 
 
@@ -302,11 +330,11 @@ var collectUV = function(response) {
 }
 
 var findCityBasedOnCoords=function(lat,lon) {
- // console.log("In findCity: "+ JSON.stringify(forecasts ));
+
   var keys = Object.keys(forecasts);
 
   for (var i =0; i < keys.length; i++) {
-   // console.log(forecasts[keys[i]]);
+
     if ((weather[keys[i]].lat === lat) && (weather[keys[i]].lon === lon)) {
       return weather[keys[i]].name;
     }
@@ -317,7 +345,7 @@ var displayWeather = function(city) {
 
   $("#todays-weather-info").empty();
   
-  var city, lat, lon, forecast, temp, main, description, temperature, feel, temp_min, temp_max, humidity,
+  var city, lat, lon, temp, main, description, temperature, feel, temp_min, temp_max, humidity,
   uv_index; 
 
   
