@@ -194,6 +194,7 @@ var getWeather = function(city) {
 
   }
 }
+// International Space Station`
 
 var collectForecast = function(response) {
 
@@ -227,7 +228,7 @@ var displayForecast = function() {
       f_date = thisForecast[i].dt_txt;
       f_date_array = f_date.split(" ");
       f_date = f_date_array[0];
-      
+
       newDate = $("<p class=\"forecast-date\">");      
       newDate.html(f_date);
 
@@ -271,6 +272,7 @@ var collectWeather = function(response) {
   lon = response.coord.lon;
 
   name = response.name;
+  activeCity = name;
 
   var newWeather = {"name": name, "full": full, "main":main,"description":description,"farenheight":farenheight,"humidity":humidity,"windspeed":windspeed, "lat": lat, "lon": lon};
 

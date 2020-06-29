@@ -18,6 +18,7 @@ body {
     font-family: 'Heebo', sans-serif;
     background-color:rgb(128, 170, 248);
     padding-bottom:100px;
+    
 }
 
 .frame {
@@ -27,15 +28,14 @@ body {
     position: relative;
     margin:auto;
     border-radius: 8px;
-    box-shadow: 0 0 12px gray;
-    margin-top:10px;
+    box-shadow: 0 0 12px rgb(13, 99, 157);
+    margin-top:40px;
     overflow: hidden;
 }
 .wrapper {
     width:100%;
     box-sizing: border-box;
     margin:0;
-    height:100vh;
 }
 .base {
     width:100%;
@@ -45,7 +45,7 @@ body {
     padding:0;
     margin:0;
     background-color:white;
-    height:100vh;
+    height:70vh;
     position: relative;
 }
 
@@ -57,7 +57,6 @@ body {
     background-color:#eeeeee;
     vertical-align: top;
     margin-bottom:0;
-    min-height:100px;
     padding-top:40px;
     padding-bottom:20px;
 }
@@ -77,6 +76,7 @@ font-size:2.7em;
 line-height:1em;
 letter-spacing:-.02em;
 text-align: center;
+user-select: none;
 /* box-shadow:0 0 8px black; */
 }
 
@@ -213,7 +213,7 @@ form {
 
 .forecast-card {
     width:20%;
-    height:200px;
+    min-height:200px;
     display:inline-block;
     float:left;
     margin-top:20px;
@@ -223,6 +223,12 @@ form {
     background-color:rgb(152, 195, 233);
     border:2px solid white;
     border-radius:8px;
+}
+
+.five-day-forecast {
+    box-sizing: border-box;
+    width:95%;
+    margin:auto;
 }
 
 .forecast-title {
@@ -255,13 +261,15 @@ zoom: 1;
     .panel {
         float:left;
         width:30%;
-        min-height:100vh;
+        min-height:600px;
+        height:70vh;
     }
 
     .base {
         float:left;
         width:70%;
-        min-height:70vh;
+        height:70vh;
+        min-height:600px;
     }
 
     .city-input {
