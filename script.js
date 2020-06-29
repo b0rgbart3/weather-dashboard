@@ -180,7 +180,7 @@ var getForecast = function(city) {
       // After data comes back from the request
       .then(collectWeather);
 
-    var forecastURL = "https://api.openweathermap.org/data/2.5/forecast/daily?q="+revisedCityString+"&appid=62eccb5941f413a5e06f6c5f0bdba432";
+    var forecastURL = "https://api.openweathermap.org/data/2.5/forecast?q="+revisedCityString+"&appid=196510002b5290425c8c92315ac3753d";
 
     // Performing an AJAX request with the queryURL
     $.ajax({
