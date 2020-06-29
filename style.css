@@ -31,6 +31,7 @@ body {
     box-shadow: 0 0 12px rgb(13, 99, 157);
     margin-top:40px;
     overflow: hidden;
+    max-width:1200px;
 }
 .wrapper {
     width:100%;

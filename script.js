@@ -70,14 +70,17 @@ var clearAll = function(event) {
 }
 var removeCity = function(event) {
 
- // console.log("Removing");
+  event.stopPropagation();
+
   cityToRemove = $(event.target).data("id");
- 
+  console.log("Removing: " + cityToRemove);
+
   delete weather[cityToRemove];
-  cities.splice(cityToRemove, 1);
+  var cityIndex = cities.indexOf(cityToRemove);
+  cities.splice(cityIndex, 1);
+  console.log("cities: " + cities);
   saveCities();
-  //console.log(weather);
-  //console.log(cities);  
+ 
   displayCityButtons();
   if (cities[length-1] > 0) {
     activeCity = cities[length-1];
@@ -280,6 +283,8 @@ var collectWeather = function(response) {
   weather[name] = newWeather;
   //console.log("All weather objects: " + JSON.stringify(weather) );
   displayWeather(activeCity);
+  //$("#city-input").val("");
+  document.getElementById("search-form").reset();
   // console.log(newForecast);
   //console.log(forecasts);
   // make sure this city is not already in our list
@@ -333,12 +338,15 @@ var collectUV = function(response) {
 
 var findCityBasedOnCoords=function(lat,lon) {
 
-  var keys = Object.keys(forecasts);
+  var keys = Object.keys(weather);
 
   for (var i =0; i < keys.length; i++) {
 
-    if ((weather[keys[i]].lat === lat) && (weather[keys[i]].lon === lon)) {
-      return weather[keys[i]].name;
+    // make sure this exists
+    if (weather[keys[i]]) {
+      if ((weather[keys[i]].lat === lat) && (weather[keys[i]].lon === lon)) {
+        return weather[keys[i]].name;
+      }
     }
   }
 }
