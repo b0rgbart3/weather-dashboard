@@ -27,11 +27,14 @@ $(document).on("keypress", "#city-input", function(e){
   }
 });
 
+var date;
+
 $(document).ready(function() {
 
+    date = moment().format("MM/DD/YYYY");
     var cityList = localStorage.getItem("wd-cities");
     if (cityList) {
-      cities = JSON.parse();
+      cities = JSON.parse(cityList);
     }
 
     getForecasts();
@@ -180,8 +183,9 @@ var getForecast = function(city) {
 }
 
 var collectForecast = function(response) {
-  var main, description, farenheight, feel, temp_min, temp_max, humidity, windspeed, uv_index, lat, lon, name; 
+  var full, main, description, farenheight, feel, temp_min, temp_max, humidity, windspeed, uv_index, lat, lon, name; 
 
+  full = response.weather;
   main = response.weather[0].main;
   description = response.weather[0].description; 
   farenheight = ((response.main.temp * (9/5) ) - 459.67);
@@ -192,7 +196,7 @@ var collectForecast = function(response) {
 
   name = response.name;
 
-  var newForecast = {"name": name, "main":main,"description":description,"farenheight":farenheight,"humidity":humidity,"windspeed":windspeed, "lat": lat, "lon": lon};
+  var newForecast = {"name": name, "full": full, "main":main,"description":description,"farenheight":farenheight,"humidity":humidity,"windspeed":windspeed, "lat": lat, "lon": lon};
 
   forecasts[name] = newForecast;
   // console.log(newForecast);
@@ -278,7 +282,7 @@ var displayForecast = function(city) {
 
   if (forecast) {
       title = $("<h1>");
-      title.text(city);
+      title.html(city + " <span class=\"title-date\">(" + date + ")</span>");
       main= $("<p>");
       if (forecast.main) {
       main.text(forecast.main); }
@@ -303,6 +307,14 @@ var displayForecast = function(city) {
       $("#todays-weather-info").append(humidity);
       $("#todays-weather-info").append(windspeed);
       $("#todays-weather-info").append(uv_index);
+
+      if (forecast.full) {
+        console.log("FULL: " + JSON.stringify(forecast.full));
+
+        $("#5-day-forecast").empty();
+        // $("#5-day-forecast").append(title);
+
+      }
   }
 
 }

@@ -193,6 +193,11 @@ form {
     background-color:#bbbbbb;
 }
 
+.title-date {
+    font-size:.7em;
+    opacity:.5;
+}
+
 /*  ClearFix  */
 /*  The ClearFix by Tony Aslett and Nicholas Gallagher */
 .group:before,
