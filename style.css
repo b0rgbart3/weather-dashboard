@@ -46,6 +46,7 @@ body {
     margin:0;
     background-color:white;
     height:100vh;
+    position: relative;
 }
 
 .panel {
@@ -198,6 +199,17 @@ form {
     opacity:.5;
 }
 
+.weather-icon {
+    position: absolute;
+    top:14px;
+    right:2%;
+    width:160px;
+    height:150px;
+}
+
+.weather-icon img {
+    width:100%;
+}
 /*  ClearFix  */
 /*  The ClearFix by Tony Aslett and Nicholas Gallagher */
 .group:before,

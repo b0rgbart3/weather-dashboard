@@ -6,7 +6,7 @@
     // also, store the user requested city names in local Storage
     // and create buttons for each city
 
-
+var weatherIcons = ["clouds","drizzle","flurries","hail","heavyrain","rain","snow","storm","clear","scatteredshowers","lightsnow","lightning","partlycloudy","overcast_night","clearnight"];
 var cities = [];
 // an index to the city name that we are currently viewing
 var activeCity = 0;
@@ -170,19 +170,34 @@ var getForecast = function(city) {
 
     // Constructing a queryURL using the revised city name
 
-    var queryURL = "https://api.openweathermap.org/data/2.5/weather?q="+revisedCityString+"&appid=196510002b5290425c8c92315ac3753d";
+    var weatherQueryURL = "https://api.openweathermap.org/data/2.5/weather?q="+revisedCityString+"&appid=196510002b5290425c8c92315ac3753d";
 
     // Performing an AJAX request with the queryURL
     $.ajax({
-      url: queryURL,
+      url: weatherQueryURL,
+      method: "GET"
+    })
+      // After data comes back from the request
+      .then(collectWeather);
+
+    var forecastURL = "https://api.openweathermap.org/data/2.5/forecast/daily?q="+revisedCityString+"&appid=62eccb5941f413a5e06f6c5f0bdba432";
+
+    // Performing an AJAX request with the queryURL
+    $.ajax({
+      url: forecastURL,
       method: "GET"
     })
       // After data comes back from the request
       .then(collectForecast);
+
   }
 }
 
 var collectForecast = function(response) {
+  console.log("Got forecast: " + JSON.stringify(response));
+}
+
+var collectWeather = function(response) {
   var full, main, description, farenheight, feel, temp_min, temp_max, humidity, windspeed, uv_index, lat, lon, name; 
 
   full = response.weather;
@@ -286,6 +301,10 @@ var displayForecast = function(city) {
       main= $("<p>");
       if (forecast.main) {
       main.text(forecast.main); }
+      if (weatherIcons.includes(forecast.main.toLowerCase())) {
+        console.log("We have an icon for that!");
+        $("#weather-icon").attr("src","weather_icons/" + forecast.main.toLowerCase() + ".png");
+      }
       description = $("<p>");
       description.text(forecast.description); 
       temperature = $("<p>");
@@ -309,9 +328,7 @@ var displayForecast = function(city) {
       $("#todays-weather-info").append(uv_index);
 
       if (forecast.full) {
-        console.log("FULL: " + JSON.stringify(forecast.full));
-
-        $("#5-day-forecast").empty();
+        display5dayForecast(forecast.full);
         // $("#5-day-forecast").append(title);
 
       }
@@ -322,3 +339,12 @@ var displayForecast = function(city) {
 // In Add New City: {"coord":{"lon":-122.42,"lat":37.77},"weather":[{"id":803,"main":"Clouds","description":"broken clouds","icon":"04n"}],"base":"stations","main":{"temp":286.45,"feels_like":280.07,"temp_min":285.37,"temp_max":287.59,"pressure":1009,"humidity":82},"visibility":16093,"wind":{"speed":9.3,"deg":270},"clouds":{"all":75},"dt":1593318802,"sys":{"type":1,"id":5817,"country":"US","sunrise":1593262198,"sunset":1593315334},"timezone":-25200,"id":5391959,"name":"San Francisco","cod":200}
 
 
+var display5dayForecast = function(fullForecast) {
+  var days;
+  console.log("FULL: " + JSON.stringify(fullForecast));
+
+  days = fullForecast.length;
+  console.log("days: " + days);
+  $("#5-day-forecast").empty();
+
+}
