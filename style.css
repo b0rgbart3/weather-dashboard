@@ -210,6 +210,16 @@ form {
 .weather-icon img {
     width:100%;
 }
+
+.forecast-card {
+    width:18%;
+    height:200px;
+    border:4px solid red;
+    margin:1px;
+    display:inline-block;
+    float:left;
+}
+
 /*  ClearFix  */
 /*  The ClearFix by Tony Aslett and Nicholas Gallagher */
 .group:before,

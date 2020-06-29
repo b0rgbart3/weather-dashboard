@@ -11,8 +11,9 @@ var cities = [];
 // an index to the city name that we are currently viewing
 var activeCity = 0;
 
-// store the forecast data in a local object
+// store the weather data in a local object
 // so we don't have to ping an outside server every time
+var weather = {};
 var forecasts = {};
 var uv_indexes = {};
 
@@ -35,10 +36,14 @@ $(document).ready(function() {
     var cityList = localStorage.getItem("wd-cities");
     if (cityList) {
       cities = JSON.parse(cityList);
+      activeCity = cities[cities.length -1];
+     // console.log(activeCity);
+      getWeather(activeCity);
     }
 
-    getForecasts();
+    //getWeathers();
     displayCityButtons();
+  
 
    // getForecast(cities[activeCity]);
     // If the user clicks the add city button (submit) - 
@@ -56,27 +61,23 @@ $(document).ready(function() {
 var clearAll = function(event) {
 
     cities = [];
-    forecasts = [];
+    weather = {};
     displayCityButtons;
-    displayForecast("");
+    displayWeather("");
     $("#city-button-block").empty();
     localStorage.setItem("wd-cities", "");
 
 }
 var removeCity = function(event) {
 
-  console.log("Removing");
+ // console.log("Removing");
   cityToRemove = $(event.target).data("id");
  
-  //var thisCity = cities[cityToRemove];
-  console.log("In removeCity: " + cityToRemove);
-  console.log(forecasts);
-  console.log(cities);
-  delete forecasts[cityToRemove];
+  delete weather[cityToRemove];
   cities.splice(cityToRemove, 1);
   saveCities();
-  console.log(forecasts);
-  console.log(cities);  
+  //console.log(weather);
+  //console.log(cities);  
   displayCityButtons();
   if (cities[length-1] > 0) {
     activeCity = cities[length-1];
@@ -87,15 +88,20 @@ var removeCity = function(event) {
 var chooseCity = function(event) {
   activeCity = $(event.target).data("id");
 
-  // console.log("Active City: " + activeCity);
-  // console.log(cities[activeCity]);
+  //console.log("Active City: " + activeCity);
+
   displayCity();
 }
 
 var displayCity = function() {
-  getForecast( activeCity );
-  if (forecasts[activeCity]) {
-    displayForecast( activeCity );
+ // getWeather( activeCity );
+  //console.log("In displayCity, activeCity =" + activeCity);
+  //console.log(JSON.stringify(weather));
+  if (weather[activeCity]) {
+  //  console.log("Found a weather object for this city.");
+    displayWeather( activeCity );
+  } else {
+    getWeather(activeCity);
   }
 }
 var addCity = function(event) {
@@ -108,7 +114,7 @@ var addCity = function(event) {
       // Start with checking to see if there are more than two chars
 
 
-      getForecast(newCity);
+      getWeather(newCity);
    }
    // we used to create a button every time the user
    // added a new city.
@@ -124,14 +130,11 @@ var addCity = function(event) {
 // of cities as buttons in the panel
 
 var displayCityButtons = function() {
-  //console.log("In display");
+
   $("#city-button-block").empty();
 
   cities.forEach( function(city,index) {
-  //  console.log(forecasts);
- 
     createPanelButton(city,index);
-
   });
 
 }
@@ -153,16 +156,15 @@ var createPanelButton = function(city,index) {
   $("#city-button-block").prepend(newButton);
 }
 
-var getForecasts = function() {
+var getWeathers = function() {
 
   cities.forEach( function(city){
-    console.log("Getting forecast for: "+city);
-    getForecast(city);
+    getWeather(city);
   } );
 }
-var getForecast = function(city) {
+var getWeather = function(city) {
   // If we haven't yet grabbed the forecast data from the server,
-  if (!forecasts[city]) {
+  if (!weather[city]) {
    
     //console.log("sending a get for: " + city);
     // revise the city name to make sure it doesn't contain spaces
@@ -194,9 +196,40 @@ var getForecast = function(city) {
 }
 
 var collectForecast = function(response) {
-  console.log("Got forecast: " + JSON.stringify(response));
+
+  if (response) {
+
+
+    // NOTE:  We are assuming that this response forecast object is related
+    // to the current "ActiveCity".... however, there is no identifier in the
+    // data object itself to confirm that....!
+
+    forecasts[activeCity] = response.list;
+    displayForecast();
+  }
 }
 
+var displayForecast = function() {
+   var thisForecast = forecasts[activeCity];
+   var f_temp, f_humidity, f_main, f_description;
+   for (var i = 0; i < 5; i++ )
+   {
+      console.log("Displaying a forecast: " + JSON.stringify(thisForecast[i] ));
+      f_temp = thisForecast[i].main.temp;
+      f_humidity = thisForecast[i].main.humidity;
+      f_main = thisForecast[i].weather.main;
+      f_description = thisForecast[i].weather.description;
+
+      var newCard = $("<div class='forecast-card'>");
+      var newTemp = $("<p>");
+      newTemp.text("Temp: " + f_temp);
+      newCard.append(newTemp);
+
+      $("#5-day-forecast").append(newCard);
+   }
+
+
+}
 var collectWeather = function(response) {
   var full, main, description, farenheight, feel, temp_min, temp_max, humidity, windspeed, uv_index, lat, lon, name; 
 
@@ -211,9 +244,12 @@ var collectWeather = function(response) {
 
   name = response.name;
 
-  var newForecast = {"name": name, "full": full, "main":main,"description":description,"farenheight":farenheight,"humidity":humidity,"windspeed":windspeed, "lat": lat, "lon": lon};
+  var newWeather = {"name": name, "full": full, "main":main,"description":description,"farenheight":farenheight,"humidity":humidity,"windspeed":windspeed, "lat": lat, "lon": lon};
 
-  forecasts[name] = newForecast;
+  //console.log("Created new weather object");
+  weather[name] = newWeather;
+  //console.log("All weather objects: " + JSON.stringify(weather) );
+  displayWeather(activeCity);
   // console.log(newForecast);
   //console.log(forecasts);
   // make sure this city is not already in our list
@@ -227,12 +263,10 @@ var collectWeather = function(response) {
   if (!uv_indexes[name]) {
    
     // Get the Lat and Lon from our Forecasts aray
-    var lat = forecasts[name].lat;
-    var lon = forecasts[name].lon;
-    // Constructing a queryURL using the revised city name
+    var lat = weather[name].lat;
+    var lon = weather[name].lon;
 
-    //http://samples.openweathermap.org/data/2.5/uvi/forecast?lat=37.75&lon=-122.37&appid=439d4b804bc8187953eb36d2a8c26a02
-
+    // Constructing a queryURL for the UV-INDEX using the revised city name
     var queryURL = "https://api.openweathermap.org/data/2.5/uvi/forecast?lat="+lat+"&lon="+lon+"&appid=196510002b5290425c8c92315ac3753d";
 
     // Performing an AJAX request with the queryURL
@@ -244,8 +278,6 @@ var collectWeather = function(response) {
       .then(collectUV);
   }
 
-
-   // displayForecast(name);
 }
 
 var saveCities = function() {
@@ -260,14 +292,12 @@ var collectUV = function(response) {
 
   // Use the lat and lon values to match to our Forecasts aray
   var cityName = findCityBasedOnCoords(lat,lon);
-   //console.log(lat + ", " + lon);
-   //console.log("Found a corresponding city name: " + cityName);
-  // console.log("Got into collectUV: " + UV_index);
+
   uv_indexes[cityName] = UV_index;
 
-  if (Object.keys(forecasts).length === cities.length)  {
-   // console.log('about to display latest');
-    displayForecast(cities[ cities.length-1 ]);
+  if (Object.keys(weather).length === cities.length)  {
+
+    displayWeather(cities[ cities.length-1 ]);
   }
 }
 
@@ -277,13 +307,13 @@ var findCityBasedOnCoords=function(lat,lon) {
 
   for (var i =0; i < keys.length; i++) {
    // console.log(forecasts[keys[i]]);
-    if ((forecasts[keys[i]].lat === lat) && (forecasts[keys[i]].lon === lon)) {
-      return forecasts[keys[i]].name;
+    if ((weather[keys[i]].lat === lat) && (weather[keys[i]].lon === lon)) {
+      return weather[keys[i]].name;
     }
   }
 }
 
-var displayForecast = function(city) {
+var displayWeather = function(city) {
 
   $("#todays-weather-info").empty();
   
@@ -293,26 +323,26 @@ var displayForecast = function(city) {
   
   //city = cities[activeCity];
 
-  forecast = forecasts[city];
+  thisWeather = weather[city];
 
-  if (forecast) {
+  if (thisWeather) {
       title = $("<h1>");
       title.html(city + " <span class=\"title-date\">(" + date + ")</span>");
       main= $("<p>");
-      if (forecast.main) {
-      main.text(forecast.main); }
-      if (weatherIcons.includes(forecast.main.toLowerCase())) {
-        console.log("We have an icon for that!");
-        $("#weather-icon").attr("src","weather_icons/" + forecast.main.toLowerCase() + ".png");
+      if (thisWeather.main) {
+      main.text(thisWeather.main); }
+      if (weatherIcons.includes(thisWeather.main.toLowerCase())) {
+       // console.log("We have an icon for that!");
+        $("#weather-icon").attr("src","weather_icons/" + thisWeather.main.toLowerCase() + ".png");
       }
       description = $("<p>");
-      description.text(forecast.description); 
+      description.text(thisWeather.description); 
       temperature = $("<p>");
-      temperature.html("Temperature: " + forecast.farenheight.toFixed(2) + "	&#176;F");
+      temperature.html("Temperature: " + thisWeather.farenheight.toFixed(2) + "	&#176;F");
       humidity = $("<p>");
-      humidity.text("Humidity: " + forecast.humidity + " %");
+      humidity.text("Humidity: " + thisWeather.humidity + " %");
       windspeed = $("<p>");
-      windspeed.text("Wind Speed: " + forecast.windspeed + " MPH");
+      windspeed.text("Wind Speed: " + thisWeather.windspeed + " MPH");
       uv_index = $("<p>");
       uv_index.text("UV - Index: " + uv_indexes[city]);
       
@@ -327,11 +357,6 @@ var displayForecast = function(city) {
       $("#todays-weather-info").append(windspeed);
       $("#todays-weather-info").append(uv_index);
 
-      if (forecast.full) {
-        display5dayForecast(forecast.full);
-        // $("#5-day-forecast").append(title);
-
-      }
   }
 
 }
@@ -339,12 +364,12 @@ var displayForecast = function(city) {
 // In Add New City: {"coord":{"lon":-122.42,"lat":37.77},"weather":[{"id":803,"main":"Clouds","description":"broken clouds","icon":"04n"}],"base":"stations","main":{"temp":286.45,"feels_like":280.07,"temp_min":285.37,"temp_max":287.59,"pressure":1009,"humidity":82},"visibility":16093,"wind":{"speed":9.3,"deg":270},"clouds":{"all":75},"dt":1593318802,"sys":{"type":1,"id":5817,"country":"US","sunrise":1593262198,"sunset":1593315334},"timezone":-25200,"id":5391959,"name":"San Francisco","cod":200}
 
 
-var display5dayForecast = function(fullForecast) {
-  var days;
-  console.log("FULL: " + JSON.stringify(fullForecast));
+// var display5dayForecast = function(fullForecast) {
+//   var days;
+//   console.log("FULL: " + JSON.stringify(fullForecast));
 
-  days = fullForecast.length;
-  console.log("days: " + days);
-  $("#5-day-forecast").empty();
+//   days = fullForecast.length;
+//   console.log("days: " + days);
+//   $("#5-day-forecast").empty();
 
-}
+// }
