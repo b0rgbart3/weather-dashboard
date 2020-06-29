@@ -29,7 +29,10 @@ $(document).on("keypress", "#city-input", function(e){
 
 $(document).ready(function() {
 
-    cities = JSON.parse(localStorage.getItem("wd-cities"));
+    var cityList = localStorage.getItem("wd-cities");
+    if (cityList) {
+      cities = JSON.parse();
+    }
 
     getForecasts();
     displayCityButtons();
@@ -41,20 +44,57 @@ $(document).ready(function() {
 
     $("#add-city").click(addCity);
     $(".city-button").click(chooseCity);
+    $(".del-button").click(removeCity);
+    $("#clear-all").click(clearAll);
   
 
 });
+
+var clearAll = function(event) {
+
+    cities = [];
+    forecasts = [];
+    displayCityButtons;
+    displayForecast("");
+    $("#city-button-block").empty();
+    localStorage.setItem("wd-cities", "");
+
+}
+var removeCity = function(event) {
+
+  console.log("Removing");
+  cityToRemove = $(event.target).data("id");
+ 
+  //var thisCity = cities[cityToRemove];
+  console.log("In removeCity: " + cityToRemove);
+  console.log(forecasts);
+  console.log(cities);
+  delete forecasts[cityToRemove];
+  cities.splice(cityToRemove, 1);
+  saveCities();
+  console.log(forecasts);
+  console.log(cities);  
+  displayCityButtons();
+  if (cities[length-1] > 0) {
+    activeCity = cities[length-1];
+    displayCity();
+  }
+}
+
 var chooseCity = function(event) {
   activeCity = $(event.target).data("id");
 
   // console.log("Active City: " + activeCity);
   // console.log(cities[activeCity]);
-  getForecast( cities[activeCity] );
-  if (forecasts[cities[activeCity]]) {
-    displayForecast( cities[activeCity] );
-  }
+  displayCity();
 }
 
+var displayCity = function() {
+  getForecast( activeCity );
+  if (forecasts[activeCity]) {
+    displayForecast( activeCity );
+  }
+}
 var addCity = function(event) {
    event.preventDefault();
 
@@ -64,12 +104,7 @@ var addCity = function(event) {
    if (newCity.length > 2) {
       // Start with checking to see if there are more than two chars
 
-      // make sure this city is not already in our list
-      if (!cities.includes(newCity)) {
-        cities.push(newCity);
-        activeCity = cities.length-1;
-        localStorage.setItem("wd-cities", JSON.stringify(cities));
-      }
+
       getForecast(newCity);
    }
    // we used to create a button every time the user
@@ -77,7 +112,7 @@ var addCity = function(event) {
    // But with this refactor -- all the buttons get created at the
    // same time with the same function - displayCityButtons()
   // createPanelButton(newCity);
-   displayCityButtons();
+  // displayCityButtons();
   
 }
 
@@ -86,10 +121,14 @@ var addCity = function(event) {
 // of cities as buttons in the panel
 
 var displayCityButtons = function() {
+  //console.log("In display");
   $("#city-button-block").empty();
 
   cities.forEach( function(city,index) {
+  //  console.log(forecasts);
+ 
     createPanelButton(city,index);
+
   });
 
 }
@@ -99,16 +138,22 @@ var displayCityButtons = function() {
 var createPanelButton = function(city,index) {
   var newButton = $("<button>");
   newButton.text(city);
-  newButton.attr("data-id", index);
+  newButton.attr("data-id", cities[index]);
   newButton.addClass("city-button");
   newButton.click(chooseCity);
+  var delButton = $("<button>");
+  delButton.text("del");
+  delButton.addClass("del-button");
+  delButton.attr("data-id", cities[index]);
+  newButton.append(delButton);
+  
   $("#city-button-block").prepend(newButton);
 }
 
 var getForecasts = function() {
 
   cities.forEach( function(city){
-   // console.log("Getting forecast for: "+city);
+    console.log("Getting forecast for: "+city);
     getForecast(city);
   } );
 }
@@ -151,6 +196,14 @@ var collectForecast = function(response) {
 
   forecasts[name] = newForecast;
   // console.log(newForecast);
+  //console.log(forecasts);
+  // make sure this city is not already in our list
+  if (!cities.includes(name)) {
+    cities.push(name);
+    activeCity = cities.length-1;
+    saveCities();
+    displayCityButtons();
+  }
 
   if (!uv_indexes[name]) {
    
@@ -176,6 +229,11 @@ var collectForecast = function(response) {
    // displayForecast(name);
 }
 
+var saveCities = function() {
+  localStorage.setItem("wd-cities", JSON.stringify(cities));
+
+}
+
 var collectUV = function(response) {
   var UV_index = response[0].value;
   var lat = response[0].lat;
@@ -189,7 +247,8 @@ var collectUV = function(response) {
   uv_indexes[cityName] = UV_index;
 
   if (Object.keys(forecasts).length === cities.length)  {
-    displayForecast(cities[0]);
+   // console.log('about to display latest');
+    displayForecast(cities[ cities.length-1 ]);
   }
 }
 
@@ -217,32 +276,34 @@ var displayForecast = function(city) {
 
   forecast = forecasts[city];
 
-  title = $("<h1>");
-  title.text(city);
-  main= $("<p>");
-  if (forecast.main) {
-  main.text(forecast.main); }
-  description = $("<p>");
-  description.text(forecast.description); 
-  temperature = $("<p>");
-  temperature.html("Temperature: " + forecast.farenheight.toFixed(2) + "	&#176;F");
-  humidity = $("<p>");
-  humidity.text("Humidity: " + forecast.humidity + " %");
-  windspeed = $("<p>");
-  windspeed.text("Wind Speed: " + forecast.windspeed + " MPH");
-  uv_index = $("<p>");
-  uv_index.text("UV - Index: " + uv_indexes[city]);
-  
-  // uv_index = $("<p>");
-  // uv_index.text("UV Index: " + response.wind.speed + " MPH¸");
+  if (forecast) {
+      title = $("<h1>");
+      title.text(city);
+      main= $("<p>");
+      if (forecast.main) {
+      main.text(forecast.main); }
+      description = $("<p>");
+      description.text(forecast.description); 
+      temperature = $("<p>");
+      temperature.html("Temperature: " + forecast.farenheight.toFixed(2) + "	&#176;F");
+      humidity = $("<p>");
+      humidity.text("Humidity: " + forecast.humidity + " %");
+      windspeed = $("<p>");
+      windspeed.text("Wind Speed: " + forecast.windspeed + " MPH");
+      uv_index = $("<p>");
+      uv_index.text("UV - Index: " + uv_indexes[city]);
+      
+      // uv_index = $("<p>");
+      // uv_index.text("UV Index: " + response.wind.speed + " MPH¸");
 
-  $("#todays-weather-info").append(title);
-  $("#todays-weather-info").append(main);
-  $("#todays-weather-info").append(description);
-  $("#todays-weather-info").append(temperature);
-  $("#todays-weather-info").append(humidity);
-  $("#todays-weather-info").append(windspeed);
-  $("#todays-weather-info").append(uv_index);
+      $("#todays-weather-info").append(title);
+      $("#todays-weather-info").append(main);
+      $("#todays-weather-info").append(description);
+      $("#todays-weather-info").append(temperature);
+      $("#todays-weather-info").append(humidity);
+      $("#todays-weather-info").append(windspeed);
+      $("#todays-weather-info").append(uv_index);
+  }
 
 }
 
