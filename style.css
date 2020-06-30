@@ -256,6 +256,30 @@ clear: both; }
 zoom: 1;
 }
 
+.uv {
+    border-radius:4px;
+    padding:4px;
+    margin-left:20px;
+    padding-right:20px;
+    color:white;
+    font-weight: bold;
+}
+.uv-low {
+    background-color:rgb(61, 164, 61);
+}
+.uv-mod {
+    background-color:yellow;
+}
+.uv-hi {
+    background-color:orange;
+}
+.uv-vhi {
+    background-color:rgb(186, 22, 22);
+}
+.uv-ex {
+    background-color:rgb(70, 21, 215);
+}
+
 
 @media only screen and (min-width:700px) {
 

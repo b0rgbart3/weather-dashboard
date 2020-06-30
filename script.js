@@ -73,12 +73,12 @@ var removeCity = function(event) {
   event.stopPropagation();
 
   cityToRemove = $(event.target).data("id");
-  console.log("Removing: " + cityToRemove);
+  //console.log("Removing: " + cityToRemove);
 
   delete weather[cityToRemove];
   var cityIndex = cities.indexOf(cityToRemove);
-  cities.splice(cityIndex, 1);
-  console.log("cities: " + cities);
+  cities.splice(cityToRemove, 1);
+  //console.log("cities: " + cities);
   saveCities();
  
   displayCityButtons();
@@ -167,7 +167,7 @@ var getWeathers = function() {
 }
 var getWeather = function(city) {
   // If we haven't yet grabbed the forecast data from the server,
-  if (!weather[city]) {
+  if ( (city) && (!weather[city])) {
    
     //console.log("sending a get for: " + city);
     // revise the city name to make sure it doesn't contain spaces
@@ -327,13 +327,16 @@ var collectUV = function(response) {
 
   // Use the lat and lon values to match to our Forecasts aray
   var cityName = findCityBasedOnCoords(lat,lon);
-
+  //console.log(cityName);
   uv_indexes[cityName] = UV_index;
-
-  if (Object.keys(weather).length === cities.length)  {
-
+  //console.log(uv_indexes);
+  //console.log(Object.keys(weather).length);
+  //console.log(cities.length);
+ 
+  //if (Object.keys(weather).length === cities.length)  {
+   // console.log("About to display the weather.");
     displayWeather(cities[ cities.length-1 ]);
-  }
+  //}
 }
 
 var findCityBasedOnCoords=function(lat,lon) {
@@ -353,6 +356,8 @@ var findCityBasedOnCoords=function(lat,lon) {
 
 var displayWeather = function(city) {
 
+  //console.log("Displaying the weather.");
+  //console.log(uv_indexes);
   $("#todays-weather-info").empty();
   
   var city, lat, lon, temp, main, description, temperature, feel, temp_min, temp_max, humidity,
@@ -382,11 +387,44 @@ var displayWeather = function(city) {
       windspeed = $("<p>");
       windspeed.text("Wind Speed: " + thisWeather.windspeed + " MPH");
       uv_index = $("<p>");
-      uv_index.text("UV - Index: " + uv_indexes[city]);
-      
-      // uv_index = $("<p>");
-      // uv_index.text("UV Index: " + response.wind.speed + " MPH¸");
 
+      uv_index_label = $("<span>");
+      uv_index_label.text ("UV-Index:");
+      uv_index_value = $("<span class='uv '>");
+      uv_index_value.html("&nbsp; "+uv_indexes[city]);
+
+      
+   
+  
+      var thisUVvalue = parseInt(uv_indexes[city]);
+      console.log("this UV Value = " + thisUVvalue);
+      var thisUVclass="";
+      if (thisUVvalue) {
+        console.log("switching on value: " + thisUVvalue);
+      switch(thisUVvalue) {
+        case 0: thisUVclass="uv-low";break;
+        case 1: thisUVclass="uv-low";break;
+        case 2: thisUVclass="uv-low";break;
+        case 3: thisUVclass="uv-med";break;
+        case 4: thisUVclass="uv-med";break;
+        case 5: thisUVclass="uv-med";break;
+        case 6: thisUVclass="uv-hi";break;
+        case 7: thisUVclass="uv-hi";break;
+        case 8: thisUVclass="uv-vhi";break;
+        case 9: thisUVclass="uv-vhi";break;
+        case 10: thisUVclass="uv-vhi";break;
+        case 11: thisUVclass="uv-ex";break;
+
+        default:break;
+      }
+      uv_index_value.addClass(thisUVclass);
+     
+      }
+
+      uv_index.append(uv_index_label);
+      uv_index.append(uv_index_value);
+ 
+      
       $("#todays-weather-info").append(title);
       $("#todays-weather-info").append(main);
       $("#todays-weather-info").append(description);
