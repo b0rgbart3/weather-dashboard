@@ -221,7 +221,7 @@ form {
     padding-top:20px;
     padding-left:8px;
     box-sizing: border-box;
-    background-color:rgb(152, 195, 233);
+    background-color:rgb(196, 220, 240);
     border:2px solid white;
     border-radius:8px;
 }
@@ -280,6 +280,12 @@ zoom: 1;
     background-color:rgb(70, 21, 215);
 }
 
+.forecast-icon {
+    width:60px;
+    height:60px;
+    margin:0;
+    padding:0;
+}
 
 @media only screen and (min-width:700px) {
 

@@ -252,6 +252,19 @@ var displayForecast = function() {
       newHum.html("<br>Humidity:" + f_humidity + "%");
 
       newCard.append(newDate);
+
+      newIcon = $("<img class='forecast-icon'>");
+      if (thisForecast[i].main) {
+        //newIcon.text(thisForecast[i].main); }
+        console.log("forecast main: " + thisForecast[i].weather[0].main );
+        var mainString = thisForecast[i].weather[0].main + "";
+        if (weatherIcons.includes(mainString.toLowerCase())) {
+         // console.log("We have an icon for that!");
+         newIcon.attr("src","weather_icons/" + mainString.toLowerCase() + ".png");
+          //$("#weather-icon").attr("src","weather_icons/" + thisWeather.main.toLowerCase() + ".png");
+        }
+      }
+      newCard.append(newIcon);
       newCard.append(newTemp);
       newCard.append(newHum);
 
