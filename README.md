@@ -3,6 +3,7 @@ gives the current weather data and 5 day forecast for any city
 
 ![weather dashboard demo](screenshot.jpg)
 
+<a href="https://b0rgbart3.github.io/weather-dashboard/">View Live Demo</a>
 
 ## Features
 1. gives the current weather data and 5 day forecast for any city
