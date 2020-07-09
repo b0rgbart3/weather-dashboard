@@ -100,12 +100,12 @@ var displayCity = function() {
  // getWeather( activeCity );
   //console.log("In displayCity, activeCity =" + activeCity);
   //console.log(JSON.stringify(weather));
-  if (weather[activeCity]) {
-  //  console.log("Found a weather object for this city.");
-    displayWeather( activeCity );
-  } else {
+  // if (weather[activeCity]) {
+  // //  console.log("Found a weather object for this city.");
+  //   displayWeather( activeCity );
+  // } else {
     getWeather(activeCity);
-  }
+  //}
 }
 var addCity = function(event) {
    event.preventDefault();
