@@ -43,9 +43,6 @@ var addButtonHandlers = function() {
       // add a city
       $("#add-city").click(addCity);
   
-      // remove a city
-      $(".del-button").click(removeCity);
-  
       // clear all
       $("#clear-all").click(clearAll);
 }
@@ -64,7 +61,8 @@ var clearAll = function(event) {
     cities = [];
     weather = {};
     displayCityButtons;
-    displayWeather();
+    //displayWeather();
+    clearDisplay();
     $("#city-button-block").empty();
     localStorage.setItem("wd-cities", "");
 }
@@ -74,25 +72,37 @@ var removeCity = function(event) {
   event.stopPropagation();
 
   cityToRemove = $(event.target).data("id");
-  //console.log("Removing: " + cityToRemove);
+  console.log("Removing: " + cityToRemove);
 
-  // delete weather[cityToRemove];
+  console.log(cities);
+  console.log (cities.indexOf(cityToRemove));
+  console.log(cities[cities.indexOf(cityToRemove) ]);
   var cityIndex = cities.indexOf(cityToRemove);
-  cities.splice(cityToRemove, 1);
-  //console.log("cities: " + cities);
+
+  cities.splice(cityIndex, 1);
+  // //console.log("cities: " + cities);
+
   saveCities();
  
-  displayCityButtons();
-  if (cities[length-1] > 0) {
-    activeCity = cities[length-1];
-    getWeather();
+  if (activeCity === cityIndex) {
+    console.log("removing the active city.");
+    activeCity = 0;
+  } else {
+    if (activeCity > cityIndex) {
+      activeCity = activeCity -1;
+    }
   }
+
+
+  console.log("Active City is now: " + activeCity);
+  displayCityButtons();
+  getWeather();
 }
 
 var chooseCity = function(event) {
   activeCity = $(event.target).data("id");
   activeCity = cities.indexOf(activeCity);
-  console.log("Active City: " + activeCity);
+  //console.log("Active City: " + activeCity);
 
   getWeather();
 }
@@ -149,20 +159,29 @@ var createPanelButton = function(city,index) {
   var delButton = $("<button>");
   delButton.text("del");
   delButton.addClass("del-button");
+  delButton.click(removeCity);
   delButton.attr("data-id", cities[index]);
   newButton.append(delButton);
   
   $("#city-button-block").prepend(newButton);
 }
 
+var clearDisplay=function() {
+  $("#todays-weather-info").empty();
+  $("#5-day-forecast").empty();
+  $("#weather-icon").css({"display":"none"});
+}
+
 var getWeather = function() {
 
+  clearDisplay();
+
   if ( (activeCity!=null) && cities[activeCity] ) {
-    console.log("Getting Weather");
+   // console.log("Getting Weather");
    
   
     revisedCityString = cities[activeCity].trim().replace(/ /g,"+");
-    console.log("revised city string: " + revisedCityString);
+   // console.log("revised city string: " + revisedCityString);
 
     // Constructing a queryURL using the revised city name
 
@@ -183,7 +202,7 @@ var collectWeather = function(response) {
   var full, main, description, farenheight, feel, temp_min, temp_max, humidity, windspeed, lat, lon, name; 
 
   if (response) {
-    console.log("Collecting Weather");
+   // console.log("Collecting Weather");
       full = response.weather;
       main = response.weather[0].main;
       description = response.weather[0].description; 
@@ -195,8 +214,8 @@ var collectWeather = function(response) {
 
       name = response.name;
       activeCity = cities.indexOf(name);  // we want an index
-      console.log("Active City: "+ activeCity);
-      console.log("Response name: " + name);
+   //   console.log("Active City: "+ activeCity);
+     // console.log("Response name: " + name);
 
       var newWeather = {"name": name, "full": full, "main":main,"description":description,"farenheight":farenheight,"humidity":humidity,"windspeed":windspeed, "lat": lat, "lon": lon};
 
@@ -267,7 +286,7 @@ var collectForecast = function(response) {
     forecasts[cities[activeCity]] = response.list;
     displayWeather();
     displayForecast();
-    console.log(forecasts);
+  //  console.log(forecasts);
    
 
   }
@@ -321,6 +340,7 @@ var displayForecast = function() {
         if (weatherIcons.includes(mainString.toLowerCase())) {
          // console.log("We have an icon for that!");
          newIcon.attr("src","weather_icons/" + mainString.toLowerCase() + ".png");
+         $("#weather-icon").css({"display":"inline-block"});
           //$("#weather-icon").attr("src","weather_icons/" + thisWeather.main.toLowerCase() + ".png");
         }
       }
@@ -361,7 +381,7 @@ var displayWeather = function() {
 
   //console.log("Displaying the weather.");
   //console.log(uv_indexes);
-  $("#todays-weather-info").empty();
+  
   
   var city, lat, lon, temp, main, description, temperature, feel, temp_min, temp_max, humidity,
   uv_index; 
